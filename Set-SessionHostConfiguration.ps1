@@ -5,15 +5,15 @@ $IdentityDomainName,
 
 [parameter(Mandatory)]
 [string]
-$AmdVmSize, 
-
-[parameter(Mandatory)]
-[string]
 $IdentityServiceProvider,
 
 [parameter(Mandatory)]
 [string]
-$Fslogix,
+$HostPoolRegistrationToken,    
+
+[parameter(Mandatory)]
+[string]
+$Fslogix = 'false',
 
 [parameter(Mandatory=$false)]
 [string]
@@ -25,11 +25,11 @@ $fslogixStorageFqdn,
 
 [parameter(Mandatory)]
 [string]
-$HostPoolRegistrationToken,    
+$NvidiaVmSize = 'false',
 
 [parameter(Mandatory)]
 [string]
-$NvidiaVmSize
+$AmdVmSize = 'false'
 
 # [parameter(Mandatory)]
 # [string]
