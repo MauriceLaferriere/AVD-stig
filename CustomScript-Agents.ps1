@@ -9,7 +9,11 @@
 
     [parameter(Mandatory)]
     [string]
-    $vmssName
+    $vmssName,
+    
+    [parameter(Mandatory)]
+    [string]
+    $subscriptionId
 )
 
 try {
@@ -40,7 +44,7 @@ if (-not (Test-Path -Path $folderPath)) {
     New-Item -Path $folderPath -ItemType Directory
 }
 
-$regToken = (New-AzWvdRegistrationInfo -ResourceGroupName $resourceGroupName -HostPoolName $hostPoolName -ExpirationTime (Get-Date).AddHours(2)).Token
+$regToken = (New-AzWvdRegistrationInfo -SubscriptionId $subscriptionId -ResourceGroupName $resourceGroupName -HostPoolName $hostPoolName -ExpirationTime (Get-Date).AddHours(2)).Token
 
 # Download and install the AVD Agent
 $agentInstaller = "C:\Temp\WVD-Agent.msi"
