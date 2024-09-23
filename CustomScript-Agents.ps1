@@ -51,6 +51,13 @@ if (-not (Test-Path -Path $folderPath)) {
 #$registrationToken = (New-AzWvdRegistrationInfo -SubscriptionId $subscriptionId -ResourceGroupName $resourceGroupName -HostPoolName $hostPoolName -ExpirationTime (Get-Date).AddHours(2)).Token
 
 #  Add Microsoft Entra ID Join Setting
+$registryPath = "HKLM:\SOFTWARE\Microsoft\RDInfraAgent\AzureADJoin"
+        if (Test-Path -Path $registryPath) {
+            New-ItemProperty -Path $registryPath -Name JoinAzureAD -PropertyType DWord -Value 0x01
+        } else {
+            New-item -Path $registryPath -Force | Out-Null
+            New-ItemProperty -Path $registryPath -Name JoinAzureAD -PropertyType DWord -Value 0x01
+        }
 $Setting = 
     # Enable PKU2U: https://docs.microsoft.com/en-us/azure/virtual-desktop/troubleshoot-azure-ad-connections#windows-desktop-client
     [PSCustomObject]@{
