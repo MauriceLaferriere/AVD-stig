@@ -50,18 +50,6 @@ if (-not (Test-Path -Path $folderPath)) {
 
 #$registrationToken = (New-AzWvdRegistrationInfo -SubscriptionId $subscriptionId -ResourceGroupName $resourceGroupName -HostPoolName $hostPoolName -ExpirationTime (Get-Date).AddHours(2)).Token
 
-# Download and install the AVD Agent
-$agentInstaller = "C:\Temp\WVD-Agent.msi"
-Invoke-WebRequest -Uri "https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWrmXv" -OutFile $agentInstaller
-Start-Process -FilePath 'msiexec.exe' -ArgumentList "/i $agentInstaller /quiet /norestart /passive REGISTRATIONTOKEN=$registrationToken" -Wait -PassThru
-Start-Sleep -Seconds 5
-
-# Download and install the AVD Agent Bootloader
-$agentInstaller = "C:\Temp\WVD-Agent-Bootloader.msi"
-Invoke-WebRequest -Uri "https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWrxrH" -OutFile $agentInstaller
-Start-Process msiexec.exe -ArgumentList "/i $agentInstaller /quiet /norestart /passive" -Wait
-Start-Sleep -Seconds 5
-
 #  Add Microsoft Entra ID Join Setting
 $Setting = 
     # Enable PKU2U: https://docs.microsoft.com/en-us/azure/virtual-desktop/troubleshoot-azure-ad-connections#windows-desktop-client
@@ -89,6 +77,18 @@ elseif ($Value.$($Setting.Name) -ne $Setting.Value) {
     Set-ItemProperty -Path $Setting.Path -Name $Setting.Name -Value $Setting.Value -Force
 }
 Start-Sleep -Seconds 1
+
+# Download and install the AVD Agent
+$agentInstaller = "C:\Temp\WVD-Agent.msi"
+Invoke-WebRequest -Uri "https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWrmXv" -OutFile $agentInstaller
+Start-Process -FilePath 'msiexec.exe' -ArgumentList "/i $agentInstaller /quiet /norestart /passive REGISTRATIONTOKEN=$registrationToken" -Wait -PassThru
+Start-Sleep -Seconds 5
+
+# Download and install the AVD Agent Bootloader
+$agentInstaller = "C:\Temp\WVD-Agent-Bootloader.msi"
+Invoke-WebRequest -Uri "https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWrxrH" -OutFile $agentInstaller
+Start-Process msiexec.exe -ArgumentList "/i $agentInstaller /quiet /norestart /passive" -Wait
+Start-Sleep -Seconds 5
 
 # Restart the VM
 Start-Process -FilePath 'shutdown' -ArgumentList '/r /t 30'
