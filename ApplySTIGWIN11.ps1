@@ -18,5 +18,5 @@ try {
 }try {    Install-Module SecurityPolicyDsc -Force} catch {
     Write-Error "Failed to install SecurityPolicyDsc module: $_"
 }try {    Configuration STIGWIN11 {        param        (            [parameter()]            [string]            $NodeName = 'localhost'        )            Import-Module -Name PowerSTIG        Import-DscResource -ModuleName PowerSTIG        Import-DscResource -ModuleName SecurityPolicyDsc -ModuleVersion '2.10.0.0'        Node $NodeName {            WindowsClient BaseLine {                OsVersion   = '11'	            SkipRule    = 'V-253495','V-253480','V-253282'                 Exception   = @{                    'V-253357' = @{                        ValueData = '1' # Required for using Azure Image Builder access to creation                    }                    'V-253491' = @{                        Identity = 'Guests'                     }                }            }        }    }    STIGWIN11} catch {
-    #Write-Error "Failed to compile STIGWIN11 configuration: $_"
+    Write-Error "Failed to compile STIGWIN11 configuration: $_"
 }
