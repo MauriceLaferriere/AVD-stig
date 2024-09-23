@@ -62,4 +62,34 @@ Invoke-WebRequest -Uri "https://query.prod.cms.rt.microsoft.com/cms/api/am/binar
 Start-Process msiexec.exe -ArgumentList "/i $agentInstaller /quiet /norestart /passive" -Wait
 Start-Sleep -Seconds 5
 
+#  Add Microsoft Entra ID Join Setting
+$Setting = 
+    # Enable PKU2U: https://docs.microsoft.com/en-us/azure/virtual-desktop/troubleshoot-azure-ad-connections#windows-desktop-client
+    [PSCustomObject]@{
+            Name         = 'AllowOnlineID'
+            Path         = 'HKLM:\SYSTEM\CurrentControlSet\Control\Lsa\pku2u'
+            PropertyType = 'DWord'
+            Value        = 1
+    }
+
+# Create registry key if necessary
+if (!(Test-Path -Path $Setting.Path)) {
+    New-Item -Path $Setting.Path -Force
+}
+
+# Checks for existing registry setting
+$Value = Get-ItemProperty -Path $Setting.Path -Name $Setting.Name -ErrorAction 'SilentlyContinue'
+
+# Creates the registry setting when it does not exist
+if (!$Value) {
+    New-ItemProperty -Path $Setting.Path -Name $Setting.Name -PropertyType $Setting.PropertyType -Value $Setting.Value -Force
+}
+# Updates the registry setting when it already exists
+elseif ($Value.$($Setting.Name) -ne $Setting.Value) {
+    Set-ItemProperty -Path $Setting.Path -Name $Setting.Name -Value $Setting.Value -Force
+}
+Start-Sleep -Seconds 1
+
+# Restart the VM
+Start-Process -FilePath 'shutdown' -ArgumentList '/r /t 30'
 
