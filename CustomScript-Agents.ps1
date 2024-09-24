@@ -5,39 +5,23 @@
 
     [parameter(Mandatory)]
     [string]
-    $resourceGroupName,
-
-    [parameter(Mandatory)]
-    [string]
-    $vmssName,
-    
-    [parameter(Mandatory)]
-    [string]
-    $subscriptionId,
-
-    [parameter(Mandatory)]
-    [string]
     $registrationToken
 )
 
 try {
-    Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force 
+    Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 } catch {
     Write-Error "Failed to install NuGet: $_"
 }
 
 try {
-    if (-not (Get-Module -ListAvailable -Name Az.DesktopVirtualization)) {
-        Install-Module Az.DesktopVirtualization -Force
-    }
+    Install-Module Az.DesktopVirtualization -Force -AllowClobber
 } catch {
     Write-Error "Failed to install Az.DesktopVirtualization: $_"
 }
 
 try {
-    if (-not (Get-Module -ListAvailable -Name Az)) {
-        Install-Module Az -Force
-    }
+    Install-Module Az -Force -AllowClobber
 } catch {
     Write-Error "Failed to install RemoteDesktop: $_"
 }
@@ -47,8 +31,6 @@ $folderPath = "C:\Temp"
 if (-not (Test-Path -Path $folderPath)) {
     New-Item -Path $folderPath -ItemType Directory
 }
-
-#$registrationToken = (New-AzWvdRegistrationInfo -SubscriptionId $subscriptionId -ResourceGroupName $resourceGroupName -HostPoolName $hostPoolName -ExpirationTime (Get-Date).AddHours(2)).Token
 
 #  Add Microsoft Entra ID Join Setting
 $registryPath = "HKLM:\SOFTWARE\Microsoft\RDInfraAgent\AzureADJoin"
