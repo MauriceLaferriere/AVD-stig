@@ -760,6 +760,7 @@ if ($RegistryCheckObj.result)
 }
 else
 {
+<#
     Write-Log -Message "Creating a folder inside rdsh vm for extracting deployagent zip file"
     $DeployAgentLocation = "C:\DeployAgent"
     ExtractDeploymentAgentZipFile -ScriptPath $ScriptPath -DeployAgentLocation $DeployAgentLocation
@@ -770,7 +771,7 @@ else
     Write-Log -Message "VM not registered with RDInfraAgent, script execution will continue"
 
     Write-Log "AgentInstaller is $DeployAgentLocation\RDAgentBootLoaderInstall, InfraInstaller is $DeployAgentLocation\RDInfraAgentInstall"
-
+#>
     if ($AadJoinPreview) {
         Write-Log "Azure ad join preview flag enabled"
         $registryPath = "HKLM:\SOFTWARE\Microsoft\RDInfraAgent\AzureADJoin"
@@ -789,7 +790,17 @@ else
         }
     }
 
-    InstallRDAgents -AgentBootServiceInstallerFolder "$DeployAgentLocation\RDAgentBootLoaderInstall" -AgentInstallerFolder "$DeployAgentLocation\RDInfraAgentInstall" -RegistrationToken $RegistrationInfoTokenValue -EnableVerboseMsiLogging:$EnableVerboseMsiLogging -UseAgentDownloadEndpoint $UseAgentDownloadEndpoint
+    # Download and install the AVD Agent
+    $agentInstaller = "C:\Temp\WVD-Agent.msi"
+    Invoke-WebRequest -Uri "https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWrmXv" -OutFile $agentInstaller
+    Start-Process -FilePath 'msiexec.exe' -ArgumentList "/i $agentInstaller /quiet /norestart /passive REGISTRATIONTOKEN=$registrationToken" -Wait -PassThru
+    Start-Sleep -Seconds 5
+
+    # Download and install the AVD Agent Bootloader
+    $agentInstaller = "C:\Temp\WVD-Agent-Bootloader.msi"
+    Invoke-WebRequest -Uri "https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWrxrH" -OutFile $agentInstaller
+    Start-Process msiexec.exe -ArgumentList "/i $agentInstaller /quiet /norestart /passive" -Wait
+    Start-Sleep -Seconds 5
 
     Write-Log -Message "The agent installation code was successfully executed and RDAgentBootLoader, RDAgent installed inside VM for existing hostpool: $hostPoolName"
 }
