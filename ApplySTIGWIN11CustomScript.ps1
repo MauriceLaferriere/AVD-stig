@@ -28,7 +28,7 @@ try {
 }try {    Install-Module -Name SecurityPolicyDsc -Force} catch {
     Write-Error "Failed to install SecurityPolicyDsc module: $_"
 }
-try {    Configuration STIGWIN11 {                    Import-Module -Name PowerSTIG        Import-Module -Name PSDscResources                                Node 'localhost' {            WindowsClient BaseLine {                OsVersion   = '11'	            SkipRule    = 'V-253495','V-253480','V-253282'                 Exception   = @{                    'V-253357' = @{                        ValueData = '1' # Required for using Azure Image Builder access to creation                    }                    'V-253491' = @{                        Identity = 'Guests'                     }                }            }        }    }    # Compile the configuration    STIGWIN11} catch {
+try {    Configuration STIGWIN11 {                    Import-Module -Name PowerSTIG                                Node 'localhost' {            WindowsClient BaseLine {                OsVersion   = '11'	            SkipRule    = 'V-253495','V-253480','V-253282'                 Exception   = @{                    'V-253357' = @{                        ValueData = '1' # Required for using Azure Image Builder access to creation                    }                    'V-253491' = @{                        Identity = 'Guests'                     }                }            }        }    }    # Compile the configuration    STIGWIN11} catch {
     Write-Error "Failed to compile STIGWIN11 configuration: $_"
 }
 
