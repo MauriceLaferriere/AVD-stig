@@ -34,7 +34,7 @@ try {    Configuration STIGWIN11 {                    Import-Module -Name Pow
 
 try {
     # Apply the configuration
-    #Start-DSCConfiguration -Path .\STIGWIN11 -Wait -Force -Verbose
+    Start-DSCConfiguration -Path .\STIGWIN11 -Wait -Force -Verbose
 } catch {
     Write-Error "Failed to apply STIGWIN11 configuration: $_"
 }
