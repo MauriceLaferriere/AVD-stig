@@ -787,13 +787,9 @@ else
         }
     }
 
-    $DeployBootLoaderAgentLocation = "C:\Temp\RDAgentBootLoaderInstall"
-    if (-not (Test-Path -Path $DeployBootLoaderAgentLocation)) {
-        New-Item -Path $DeployBootLoaderAgentLocation -ItemType Directory
-    }
-    $DeployInfraAgentLocation = "C:\Temp\RDInfraAgentInstall"
-    if (-not (Test-Path -Path $DeployInfraAgentLocation)) {
-        New-Item -Path $DeployInfraAgentLocation -ItemType Directory
+    $DeployAgentLocation = "C:\DeployAgent"
+    if (-not (Test-Path -Path $DeployAgentLocation)) {
+        New-Item -Path $DeployAgentLocation -ItemType Directory
     }
 
     # Download and install the AVD Agents
@@ -802,7 +798,7 @@ else
     $agentDownload = "$DeployInfraAgentLocation\Microsoft.RDInfra.RDAgent.Installer-x64-1.0.5739.9800.msi"
     Invoke-WebRequest -Uri "https://raw.githubusercontent.com/MauriceLaferriere/AVD-stig/main/Microsoft.RDInfra.RDAgent.Installer-x64-1.0.5739.9800.msi" -OutFile $agentDownload
     
-    InstallRDAgents -AgentBootServiceInstallerFolder "$DeployBootLoaderAgentLocation\RDAgentBootLoaderInstall" -AgentInstallerFolder "$DeployInfraAgentLocation\RDInfraAgentInstall" -RegistrationToken $RegistrationInfoTokenValue -EnableVerboseMsiLogging:$true -UseAgentDownloadEndpoint $false
+    InstallRDAgents -AgentBootServiceInstallerFolder "$DeployAgentLocation\RDAgentBootLoaderInstall" -AgentInstallerFolder "$DeployAgentLocation\RDInfraAgentInstall" -RegistrationToken $RegistrationInfoTokenValue -EnableVerboseMsiLogging:$true -UseAgentDownloadEndpoint $false
 
     Write-Log -Message "The agent installation code was successfully executed and RDAgentBootLoader, RDAgent installed inside VM for existing hostpool: $hostPoolName"
 }
