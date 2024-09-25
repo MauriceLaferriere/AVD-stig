@@ -787,18 +787,23 @@ else
         }
     }
 
-    $DeployAgentLocation = "C:\DeployAgent"
-    if (-not (Test-Path -Path $DeployAgentLocation)) {
-        New-Item -Path $DeployAgentLocation -ItemType Directory
+    $DeployAgentBootLoaderLocation = "C:\DeployAgent\RDAgentBootLoaderInstall"
+    if (-not (Test-Path -Path $DeployAgentBootLoaderLocation)) {
+        New-Item -Path $DeployAgentBootLoaderLocation -ItemType Directory
+    }
+
+    $DeployAgentInfraLocation = "C:\DeployAgent\RDAgentInfraInstall"
+    if (-not (Test-Path -Path $DeployAgentInfraLocation)) {
+        New-Item -Path $DeployAgentInfraLocation -ItemType Directory
     }
 
     # Download and install the AVD Agents
-    $agentDownload = "$DeployBootLoaderAgentLocation\Microsoft.RDInfra.RDAgentBootLoader.Installer-x64-1.0.8925.0.msi"
+    $agentDownload = "$DeployAgentBootLoaderLocation\Microsoft.RDInfra.RDAgentBootLoader.Installer-x64-1.0.8925.0.msi"
     Invoke-WebRequest -Uri "https://raw.githubusercontent.com/MauriceLaferriere/AVD-stig/main/Microsoft.RDInfra.RDAgentBootLoader.Installer-x64-1.0.8925.0.msi" -OutFile $agentDownload
-    $agentDownload = "$DeployInfraAgentLocation\Microsoft.RDInfra.RDAgent.Installer-x64-1.0.5739.9800.msi"
+    $agentDownload = "$DeployAgentInfraLocation\Microsoft.RDInfra.RDAgent.Installer-x64-1.0.5739.9800.msi"
     Invoke-WebRequest -Uri "https://raw.githubusercontent.com/MauriceLaferriere/AVD-stig/main/Microsoft.RDInfra.RDAgent.Installer-x64-1.0.5739.9800.msi" -OutFile $agentDownload
     
-    InstallRDAgents -AgentBootServiceInstallerFolder "$DeployAgentLocation\RDAgentBootLoaderInstall" -AgentInstallerFolder "$DeployAgentLocation\RDInfraAgentInstall" -RegistrationToken $RegistrationInfoTokenValue -EnableVerboseMsiLogging:$true -UseAgentDownloadEndpoint $false
+    InstallRDAgents -AgentBootServiceInstallerFolder "$DeployAgentBootLoaderLocation" -AgentInstallerFolder "$DeployAgentInfraLocation" -RegistrationToken $RegistrationInfoTokenValue -EnableVerboseMsiLogging:$true -UseAgentDownloadEndpoint $false
 
     Write-Log -Message "The agent installation code was successfully executed and RDAgentBootLoader, RDAgent installed inside VM for existing hostpool: $hostPoolName"
 }
