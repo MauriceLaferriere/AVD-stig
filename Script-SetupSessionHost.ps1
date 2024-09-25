@@ -27,7 +27,7 @@ param(
     [string]$SessionHostConfigurationLastUpdateTime = "",
 
     [Parameter(mandatory = $false)] 
-    [switch]$EnableVerboseMsiLogging = $false,
+    [switch]$EnableVerboseMsiLogging = $true,
     
     [Parameter(Mandatory = $false)]
     [bool]$UseAgentDownloadEndpoint = $false
@@ -787,22 +787,22 @@ else
         }
     }
 
-    $folderPath = "C:\Temp"
-    if (-not (Test-Path -Path $folderPath)) {
-        New-Item -Path $folderPath -ItemType Directory
+    $DeployBootLoaderAgentLocation = "C:\Temp\RDAgentBootLoaderInstall"
+    if (-not (Test-Path -Path $DeployBootLoaderAgentLocation)) {
+        New-Item -Path $DeployBootLoaderAgentLocation -ItemType Directory
+    }
+    $DeployInfraAgentLocation = "C:\Temp\RDInfraAgentInstall"
+    if (-not (Test-Path -Path $DeployInfraAgentLocation)) {
+        New-Item -Path $DeployInfraAgentLocation -ItemType Directory
     }
 
-    # Download and install the AVD Agent
-    $agentInstaller = "C:\Temp\WVD-Agent.msi"
-    Invoke-WebRequest -Uri "https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWrmXv" -OutFile $agentInstaller
-    Start-Process -FilePath 'msiexec.exe' -ArgumentList "/i $agentInstaller /quiet /norestart /passive REGISTRATIONTOKEN=$registrationToken" -Wait -PassThru
-    Start-Sleep -Seconds 5
-
-    # Download and install the AVD Agent Bootloader
-    $agentInstaller = "C:\Temp\WVD-Agent-Bootloader.msi"
-    Invoke-WebRequest -Uri "https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWrxrH" -OutFile $agentInstaller
-    Start-Process msiexec.exe -ArgumentList "/i $agentInstaller /quiet /norestart /passive" -Wait
-    Start-Sleep -Seconds 5
+    # Download and install the AVD Agents
+    $agentDownload = "$DeployBootLoaderAgentLocation\Microsoft.RDInfra.RDAgentBootLoader.Installer-x64-1.0.8925.0.msi"
+    Invoke-WebRequest -Uri "https://raw.githubusercontent.com/MauriceLaferriere/AVD-stig/main/Microsoft.RDInfra.RDAgentBootLoader.Installer-x64-1.0.8925.0.msi" -OutFile $agentDownload
+    $agentDownload = "$DeployInfraAgentLocation\Microsoft.RDInfra.RDAgent.Installer-x64-1.0.5739.9800.msi"
+    Invoke-WebRequest -Uri "https://raw.githubusercontent.com/MauriceLaferriere/AVD-stig/main/Microsoft.RDInfra.RDAgent.Installer-x64-1.0.5739.9800.msi" -OutFile $agentDownload
+    
+    InstallRDAgents -AgentBootServiceInstallerFolder "$DeployBootLoaderAgentLocation\RDAgentBootLoaderInstall" -AgentInstallerFolder "$DeployInfraAgentLocation\RDInfraAgentInstall" -RegistrationToken $RegistrationInfoTokenValue -EnableVerboseMsiLogging:$true -UseAgentDownloadEndpoint $false
 
     Write-Log -Message "The agent installation code was successfully executed and RDAgentBootLoader, RDAgent installed inside VM for existing hostpool: $hostPoolName"
 }
